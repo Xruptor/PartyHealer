@@ -1,0 +1,17 @@
+## Interface: 30300
+## Title: PartyHealer
+## Notes: Simple click-casting health bars for party members and player
+## Author: Xanthos
+## Version: 2.8
+## SavedVariablesPerCharacter: PH_DB
+
+libs\LibStub.lua
+libs\X_MenuClass.lua
+libs\tekKonfigScroll.lua
+libs\tekKonfigCheckbox.lua
+
+PartyHealer.lua
+PartyHealer_Config.lua
+PartyHealer_Config_Buff.lua
+PartyHealer_CastBar.lua
+PartyHealer_Report.lua
