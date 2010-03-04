@@ -101,6 +101,7 @@ end
 function phConfigBuff:SaveSettings(sSwitch)
 	if InCombatLockdown() then
 		DEFAULT_CHAT_FRAME:AddMessage("PartyHealer: You cannot edit these settings while in combat!")
+		phConfigBuff:Hide()
 		return
 	end
 	if not phConfigBuff:IsVisible() then return end

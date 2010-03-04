@@ -2,7 +2,7 @@
 ## Title: PartyHealer
 ## Notes: Simple click-casting health bars for party members and player
 ## Author: Xanthos
-## Version: 2.8
+## Version: 2.9
 ## SavedVariablesPerCharacter: PH_DB
 
 libs\LibStub.lua

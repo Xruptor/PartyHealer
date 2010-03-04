@@ -74,7 +74,7 @@ phConfig:EnableMouse(true)
 phConfig:SetMovable(true)
 phConfig:SetClampedToScreen(true)
 phConfig:SetWidth(365)
-phConfig:SetHeight(480)
+phConfig:SetHeight(510)
 
 phConfig:SetBackdrop({
 		bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -107,14 +107,14 @@ phConfig.ALTSHIFT = createEditBox("$parentEdit5", "Alt+Shift", phConfig, 60, -32
 phConfig.CTRLSHIFT = createEditBox("$parentEdit6", "Ctrl+Shift", phConfig, 60, -380)
 
 phConfig.saveButton = CreateFrame("Button", nil, phConfig, "UIPanelButtonTemplate");
-phConfig.saveButton:SetPoint("BOTTOM", phConfig, "BOTTOM", 110, 30);
+phConfig.saveButton:SetPoint("BOTTOM", phConfig, "BOTTOM", 110, 60);
 phConfig.saveButton:SetHeight(21);
 phConfig.saveButton:SetWidth(100);
 phConfig.saveButton:SetText("Save");
 phConfig.saveButton:SetScript("OnClick", function() phConfig:SaveSettings() end)
 
 phConfig.buffButton = CreateFrame("Button", nil, phConfig, "UIPanelButtonTemplate");
-phConfig.buffButton:SetPoint("BOTTOM", phConfig, "BOTTOM", -90, 30);
+phConfig.buffButton:SetPoint("BOTTOM", phConfig, "BOTTOM", -90, 60);
 phConfig.buffButton:SetHeight(21);
 phConfig.buffButton:SetWidth(135);
 phConfig.buffButton:SetText("Buff Detector");
@@ -125,6 +125,16 @@ phConfig.buffButton:SetScript("OnClick", function()
 		PartyHealer_ConfigBuff:Show()
 	end
 end)
+
+phConfig.exitButton = CreateFrame("Button", nil, phConfig, "UIPanelButtonTemplate");
+phConfig.exitButton:SetPoint("CENTER", phConfig, "BOTTOM", 0, 30);
+phConfig.exitButton:SetHeight(21);
+phConfig.exitButton:SetWidth(100);
+phConfig.exitButton:SetText("Exit");
+phConfig.exitButton:SetScript("OnClick", function()
+	phConfig:Hide()
+end)
+
 
 phConfig:SetScript("OnMouseDown", function(frame, button)
 	if frame:IsMovable() then
@@ -309,6 +319,7 @@ end
 function phConfig:SaveSettings(sSwitch)
 	if InCombatLockdown() then
 		DEFAULT_CHAT_FRAME:AddMessage("PartyHealer: You cannot edit these settings while in combat!")
+		phConfig:Hide()
 		return
 	end
 

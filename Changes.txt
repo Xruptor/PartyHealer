@@ -1,2 +1,0 @@
-Version 2.6
--Added support for vehicle health
