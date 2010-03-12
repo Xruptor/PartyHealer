@@ -99,6 +99,9 @@ f.decurseSpells = { -- get spell names
 		["Poison"] = true,
 		["Disease"] = true
 	}
+	MAGE = {
+		["Curse"] = true,
+	}
 }
 
 ------------------------------
