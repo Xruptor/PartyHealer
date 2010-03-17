@@ -156,7 +156,7 @@ end)
 	phConfigOpt:SetMovable(true)
 	phConfigOpt:SetClampedToScreen(true)
 	phConfigOpt:SetWidth(250)
-	phConfigOpt:SetHeight(350)
+	phConfigOpt:SetHeight(370)
 
 	phConfigOpt:SetBackdrop({
 			bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -264,7 +264,27 @@ end)
 	raidChk:SetScript('OnShow', function(self)
 		self:SetChecked(PH_DB.showRaid)
 	end)
-
+	local blizzRaidC = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Enable Click-Casting for\nBlizzard Raid Frames", "TOP", phConfigOpt, "TOP", -80, -290)
+	blizzRaidC:SetScript("OnClick", function(self) checksound(self); PH_DB.BlizzardRaidClickCasting = not PH_DB.BlizzardRaidClickCasting end)
+	blizzRaidC:SetScript('OnShow', function(self)
+		if InCombatLockdown() then
+			DEFAULT_CHAT_FRAME:AddMessage("PartyHealer: You cannot edit these settings while in combat!")
+			return
+		end
+		self:SetChecked(PH_DB.BlizzardRaidClickCasting)
+		if PartyHealer then PartyHealer:SetBlizzardRaidFrames() end
+	end)
+	local blizzRaidH = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Debuff Highlighting for\nBlizzard Raid Frames", "TOP", phConfigOpt, "TOP", -80, -320)
+	blizzRaidH:SetScript("OnClick", function(self) checksound(self); PH_DB.BlizzardRaidDebuffHighlight = not PH_DB.BlizzardRaidDebuffHighlight end)
+	blizzRaidH:SetScript('OnShow', function(self)
+		if InCombatLockdown() then
+			DEFAULT_CHAT_FRAME:AddMessage("PartyHealer: You cannot edit these settings while in combat!")
+			return
+		end
+		self:SetChecked(PH_DB.BlizzardRaidDebuffHighlight)
+		if PartyHealer then PartyHealer:SetBlizzardRaidFrames() end
+	end)
+	
 	phConfigOpt:SetScript("OnMouseDown", function(frame, button)
 		if frame:GetParent():IsMovable() then
 			frame:GetParent().isMoving = true

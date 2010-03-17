@@ -633,6 +633,13 @@ function f:SetBarSize()
 	end
 end
 
+function f:SetBlizzardRaidFrames()
+	if InCombatLockdown() then
+		DEFAULT_CHAT_FRAME:AddMessage("PartyHealer: You cannot edit these settings while in combat!")
+		return
+	end
+end
+
 function f:SetButtonSpells(button, buttonrez)
 	if not button then return end
 	
