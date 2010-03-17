@@ -2,7 +2,7 @@
 	PartyHealer.lua
 		A party healing mod that support configurable click-casting.
 
-	Author: Derkyle
+	Author: Xruptor
 
 	NOTE: There are several actions that are not permitted to be performed while a unit is in combat.
 	This includes showing/hiding secured action buttons.  For more details please refer to InCombatLockdown on WOWWiki.

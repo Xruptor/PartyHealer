@@ -1,7 +1,7 @@
 ## Interface: 30300
 ## Title: PartyHealer
 ## Notes: Simple click-casting health bars for party members and player
-## Author: Xanthos
+## Author: Xruptor
 ## Version: 3.0
 ## SavedVariablesPerCharacter: PH_DB
 
