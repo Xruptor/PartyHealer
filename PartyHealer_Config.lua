@@ -156,7 +156,7 @@ end)
 	phConfigOpt:SetMovable(true)
 	phConfigOpt:SetClampedToScreen(true)
 	phConfigOpt:SetWidth(250)
-	phConfigOpt:SetHeight(370)
+	phConfigOpt:SetHeight(400)
 
 	phConfigOpt:SetBackdrop({
 			bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -247,35 +247,55 @@ end)
 	phConfigOpt.bHeightSlider:SetPoint('TOP', phConfigOpt, 'TOP', -10, -160)
 	-----------------------------
 	
+	local showPowerBars = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Show Power Bars", "TOP", phConfigOpt, "TOP", -80, -200)
+	local checksound = showPowerBars:GetScript("OnClick")
+	showPowerBars:SetScript("OnClick", function(self)
+		checksound(self)
+		PH_DB.PH_ShowPowerBars = not PH_DB.PH_ShowPowerBars
+		if PartyHealer then PartyHealer:UpdateFrames() end
+	end)
+	showPowerBars:SetScript('OnShow', function(self)
+		self:SetChecked(PH_DB.PH_ShowPowerBars)
+	end)
 	
-	local bgChk = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Show in Battleground", "TOP", phConfigOpt, "TOP", -80, -200)
-	local checksound = bgChk:GetScript("OnClick")
+	local bgChk = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Show in Battleground", "TOP", phConfigOpt, "TOP", -80, -230)
 	bgChk:SetScript("OnClick", function(self) checksound(self); PH_DB.showBG = not PH_DB.showBG end)
 	bgChk:SetScript('OnShow', function(self)
 		self:SetChecked(PH_DB.showBG)
 	end)
-	local arenaChk = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Show in Arena", "TOP", phConfigOpt, "TOP", -80, -230)
+	local arenaChk = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Show in Arena", "TOP", phConfigOpt, "TOP", -80, -260)
 	arenaChk:SetScript("OnClick", function(self) checksound(self); PH_DB.showArena = not PH_DB.showArena end)
 	arenaChk:SetScript('OnShow', function(self)
 		self:SetChecked(PH_DB.showArena)
 	end)
-	local raidChk = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Show in Raid", "TOP", phConfigOpt, "TOP", -80, -260)
+	local raidChk = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Show in Raid", "TOP", phConfigOpt, "TOP", -80, -290)
 	raidChk:SetScript("OnClick", function(self) checksound(self); PH_DB.showRaid = not PH_DB.showRaid end)
 	raidChk:SetScript('OnShow', function(self)
 		self:SetChecked(PH_DB.showRaid)
 	end)
-	local blizzRaidC = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Enable Click-Casting for\nBlizzard Raid Frames", "TOP", phConfigOpt, "TOP", -80, -290)
-	blizzRaidC:SetScript("OnClick", function(self) checksound(self); PH_DB.BlizzardRaidClickCasting = not PH_DB.BlizzardRaidClickCasting end)
-	blizzRaidC:SetScript('OnShow', function(self)
+	local blizzRaidC = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Enable Click-Casting for\nBlizzard Raid Frames", "TOP", phConfigOpt, "TOP", -80, -320)
+	blizzRaidC:SetScript("OnClick", function(self)
 		if InCombatLockdown() then
 			DEFAULT_CHAT_FRAME:AddMessage("PartyHealer: You cannot edit these settings while in combat!")
 			return
 		end
-		self:SetChecked(PH_DB.BlizzardRaidClickCasting)
+		checksound(self)
+		PH_DB.BlizzardRaidClickCasting = not PH_DB.BlizzardRaidClickCasting
 		if PartyHealer then PartyHealer:SetBlizzardRaidFrames() end
 	end)
-	local blizzRaidH = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Debuff Highlighting for\nBlizzard Raid Frames", "TOP", phConfigOpt, "TOP", -80, -320)
-	blizzRaidH:SetScript("OnClick", function(self) checksound(self); PH_DB.BlizzardRaidDebuffHighlight = not PH_DB.BlizzardRaidDebuffHighlight end)
+	blizzRaidC:SetScript('OnShow', function(self)
+		self:SetChecked(PH_DB.BlizzardRaidClickCasting)
+	end)
+	local blizzRaidH = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Debuff Highlighting for\nBlizzard Raid Frames", "TOP", phConfigOpt, "TOP", -80, -355)
+	blizzRaidH:SetScript("OnClick", function(self)
+		if InCombatLockdown() then
+			DEFAULT_CHAT_FRAME:AddMessage("PartyHealer: You cannot edit these settings while in combat!")
+			return
+		end
+		checksound(self)
+		PH_DB.BlizzardRaidDebuffHighlight = not PH_DB.BlizzardRaidDebuffHighlight
+		if PartyHealer then PartyHealer:SetBlizzardRaidFrames() end
+	end)
 	blizzRaidH:SetScript('OnShow', function(self)
 		if InCombatLockdown() then
 			DEFAULT_CHAT_FRAME:AddMessage("PartyHealer: You cannot edit these settings while in combat!")
@@ -284,7 +304,7 @@ end)
 		self:SetChecked(PH_DB.BlizzardRaidDebuffHighlight)
 		if PartyHealer then PartyHealer:SetBlizzardRaidFrames() end
 	end)
-	
+
 	phConfigOpt:SetScript("OnMouseDown", function(frame, button)
 		if frame:GetParent():IsMovable() then
 			frame:GetParent().isMoving = true

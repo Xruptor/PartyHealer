@@ -203,6 +203,7 @@ function f:StartupDB()
 	if PH_DB.BlizzardRaidDebuffHighlight == nil then PH_DB.BlizzardRaidDebuffHighlight = true end
 	if PH_DB.PH_HideParty_Toggle == nil then PH_DB.PH_HideParty_Toggle = false end
 	if PH_DB.PH_HideCastBar == nil then PH_DB.PH_HideCastBar = false end
+	if PH_DB.PH_ShowPowerBars == nil then PH_DB.PH_ShowPowerBars = true end
 	if PH_DB.dbver == nil then PH_DB.dbver = ver end
 	
 end
@@ -394,7 +395,7 @@ local function doHealthPowerUpdate(self, elap)
 		end
 		
 		--do power check
-		if ( self.unit == "player" and power ~= self.powermin ) then
+		if ( power ~= self.powermin ) then
 			PartyHealer:UpdatePower(self, self.unit)
 		end
 		
@@ -409,6 +410,7 @@ local function doHealthPowerUpdate(self, elap)
 				end
 			end
 		end
+		
 	end
 end
 
@@ -442,13 +444,7 @@ function f:CreatePartyFrames()
 		pf.disconnected = true --turn off auto-updating until online check is done
 		pf:SetScript("OnUpdate", doHealthPowerUpdate)
 		
-		if i == 0 then
-			--for powerbar
-			pf:SetHeight(PH_DB.BarHeight + 4)
-		else
-			pf:SetHeight(PH_DB.BarHeight)
-		end
-		
+		pf:SetHeight(PH_DB.BarHeight + 4) --+4 is for the powerbar
 		pf:SetWidth(PH_DB.BarWidth)
 		pf:RegisterForClicks('AnyUp')
 		pf:SetBackdrop( {
@@ -469,24 +465,22 @@ function f:CreatePartyFrames()
 		pf.Health.bg:SetAllPoints(pf.Health)
 		pf.Health.bg:SetTexture(0.3, 0.3, 0.3)
 
-		--do player mana bar
-		if i == 0 then
-			pf.Power = CreateFrame('StatusBar', nil, pf)
-			pf.Power:SetPoint('BOTTOMRIGHT')
-			pf.Power:SetPoint('BOTTOMLEFT')
-			pf.Power:SetPoint('TOP', pf.Health, 'BOTTOM', 0, 0)
-			pf.Power:SetStatusBarTexture("Interface\\AddOns\\PartyHealer\\textures\\minimalist.tga")
-			pf.Power:SetHeight(4)
-			
-			local _, ptype = UnitPowerType("player")
-			local pColor = PowerBarColor[ptype]
-			pf.Power:SetStatusBarColor(pColor.r, pColor.g, pColor.b);
-			
-			pf.Power.bg = pf.Power:CreateTexture(nil, 'BORDER')
-			pf.Power.bg:SetAllPoints(pf.Power)
-			pf.Power.bg:SetTexture(0.3, 0.3, 0.3)
-			pf.Power:Show()
-		end
+		--do mana bar
+		pf.Power = CreateFrame('StatusBar', nil, pf)
+		pf.Power:SetPoint('BOTTOMRIGHT')
+		pf.Power:SetPoint('BOTTOMLEFT')
+		pf.Power:SetPoint('TOP', pf.Health, 'BOTTOM', 0, 0)
+		pf.Power:SetStatusBarTexture("Interface\\AddOns\\PartyHealer\\textures\\minimalist.tga")
+		pf.Power:SetHeight(4)
+		
+		local _, ptype = UnitPowerType("player")
+		local pColor = PowerBarColor[ptype]
+		pf.Power:SetStatusBarColor(pColor.r, pColor.g, pColor.b);
+		
+		pf.Power.bg = pf.Power:CreateTexture(nil, 'BORDER')
+		pf.Power.bg:SetAllPoints(pf.Power)
+		pf.Power.bg:SetTexture(0.3, 0.3, 0.3)
+		pf.Power:Show()
 		
 		pf.HealthText = pf.Health:CreateFontString(nil, 'OVERLAY', 'GameFontHighlightSmallRight')
 		pf.HealthText:SetPoint('RIGHT', pf.Health, -2, -1)
@@ -730,7 +724,7 @@ function f:UpdateFrames()
 		if (i == 0 and GetNumPartyMembers() > 0 ) then pass=true end
 		if PartyHealerAnchor:IsVisible() then pass=true end --allow if repositioning the anchor
 		if not f:DisplayCheck(false) then pass=false end
-		
+
 		if PH_DB.PH_Toggle and pass then
 			local class = select(2, UnitClass(unitID))
 			local isTank, isHealer, isDamage = UnitGroupRolesAssigned(unitID)
@@ -752,25 +746,32 @@ function f:UpdateFrames()
 
 			frmUH.InfoText:SetText(UnitName(unitID) or "Unknown")
 			
-			if UnitHasVehicleUI(unit) then
-				pUH.Health:SetStatusBarColor(204/255, 194/255, 138/255)
-			end
-			
-			if UnitHasVehicleUI(frmUH.unit) then
+			if UnitHasVehicleUI(unitID) then
 				frmUH.HealthText:SetText((UnitHealth(frmUH.unitVehicle) or 0).." / "..(UnitHealthMax(frmUH.unitVehicle) or 0))
 				frmUH.Health:SetStatusBarColor(204/255, 194/255, 138/255)
 			else
 				frmUH.HealthText:SetText((UnitHealth(unitID) or 0).." / "..(UnitHealthMax(unitID) or 0))
 			end
 
+			--set power bar color
+			local _, ptype = UnitPowerType(unitID)
+			local pColor = PowerBarColor[ptype] or {r=0,g=0,b=0}
+			frmUH.Power:SetStatusBarColor(pColor.r, pColor.g, pColor.b);
+			
+			if not PH_DB.PH_ShowPowerBars and frmUH.Power:IsVisible() then
+				frmUH:SetHeight(PH_DB.BarHeight)
+				frmUH.Power:Hide()
+			elseif PH_DB.PH_ShowPowerBars and not frmUH.Power:IsVisible() then
+				frmUH:SetHeight(PH_DB.BarHeight + 4)
+				frmUH.Power:Show()
+			end
+			
 			frmUH:Show() --show the party bar
 			
 			--force a status update for this unit
 			--must be done after frame is shown
 			f:UpdateHealth(frmUH, unitID)
-			if unitID == "player" then
-				f:UpdatePower(frmUH, unitID)
-			end
+			f:UpdatePower(frmUH, unitID)
 			
 			--update the casting bar position based on shown party members
 			if f.castbar then
