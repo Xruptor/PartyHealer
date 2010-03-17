@@ -9,29 +9,28 @@
 	http://www.wowwiki.com/API_InCombatLockdown
 --]]
 
-local UnitName = UnitName
-local UnitClass = UnitClass
-local UnitHealth = UnitHealth
-local UnitHealthMax = UnitHealthMax
-local UnitIsConnected = UnitIsConnected
-local UnitIsGhost = UnitIsGhost
-local UnitIsDead = UnitIsDead
-local UnitIsDeadOrGhost = UnitIsDeadOrGhost
-local UnitPower = UnitPower
-local UnitPowerMax = UnitPowerMax
-local UnitPowerType = UnitPowerType
-local UnitDebuff = UnitDebuff
-local UnitAffectingCombat = UnitAffectingCombat
-local UnitGroupRolesAssigned = UnitGroupRolesAssigned
-local GetNumPartyMembers = GetNumPartyMembers
-local GetRealmName = GetRealmName
-local GetSpellInfo = GetSpellInfo
-local GetSpellTexture = GetSpellTexture
-local InCombatLockdown = InCombatLockdown
-local GetNumBattlefieldScores = GetNumBattlefieldScores
-local IsActiveBattlefieldArena = IsActiveBattlefieldArena
-local GetBattlefieldStatus = GetBattlefieldStatus
-local UnitHasVehicleUI = UnitHasVehicleUI
+local UnitName = _G.UnitName
+local UnitClass = _G.UnitClass
+local UnitHealth = _G.UnitHealth
+local UnitHealthMax = _G.UnitHealthMax
+local UnitIsConnected = _G.UnitIsConnected
+local UnitIsGhost = _G.UnitIsGhost
+local UnitIsDead = _G.UnitIsDead
+local UnitIsDeadOrGhost = _G.UnitIsDeadOrGhost
+local UnitPower = _G.UnitPower
+local UnitPowerMax = _G.UnitPowerMax
+local UnitPowerType = _G.UnitPowerType
+local UnitDebuff = _G.UnitDebuff
+local UnitAffectingCombat = _G.UnitAffectingCombat
+local UnitGroupRolesAssigned = _G.UnitGroupRolesAssigned
+local GetNumPartyMembers = _G.GetNumPartyMembers
+local GetRealmName = _G.GetRealmName
+local GetSpellInfo = _G.GetSpellInfo
+local InCombatLockdown = _G.InCombatLockdown
+local GetNumBattlefieldScores = _G.GetNumBattlefieldScores
+local IsActiveBattlefieldArena = _G.IsActiveBattlefieldArena
+local GetBattlefieldStatus = _G.GetBattlefieldStatus
+local UnitHasVehicleUI = _G.UnitHasVehicleUI
 
 local currentPlayer = UnitName('player')
 local currentRealm = GetRealmName()
@@ -195,9 +194,13 @@ function f:StartupDB()
 	if PH_DB.PH_Toggle == nil then PH_DB.PH_Toggle = true end
 	if PH_DB.Scale == nil then PH_DB.Scale = 1 end
 	if PH_DB.Alpha == nil then PH_DB.Alpha = 1 end
+	if PH_DB.BarWidth == nil then PH_DB.BarWidth = 180 end
+	if PH_DB.BarHeight == nil then PH_DB.BarHeight = 19 end
 	if PH_DB.showBG == nil then PH_DB.showBG = true end
 	if PH_DB.showArena == nil then PH_DB.showArena = true end
 	if PH_DB.showRaid == nil then PH_DB.showRaid = true end
+	if PH_DB.BlizzardRaidClickCasting == nil then PH_DB.BlizzardRaidClickCasting = true end
+	if PH_DB.BlizzardRaidDebuffHighlight == nil then PH_DB.BlizzardRaidDebuffHighlight = true end
 	if PH_DB.PH_HideParty_Toggle == nil then PH_DB.PH_HideParty_Toggle = false end
 	if PH_DB.PH_HideCastBar == nil then PH_DB.PH_HideCastBar = false end
 	if PH_DB.dbver == nil then PH_DB.dbver = ver end
@@ -412,7 +415,6 @@ end
 function f:CreatePartyFrames()
 	for i=0,4 do
 		local pf
-		local frameH, frameW = 19, 180
 		local rezbutton
 		
 		if i == 0 then
@@ -442,12 +444,12 @@ function f:CreatePartyFrames()
 		
 		if i == 0 then
 			--for powerbar
-			pf:SetHeight(frameH+4)
+			pf:SetHeight(PH_DB.BarHeight + 4)
 		else
-			pf:SetHeight(frameH)
+			pf:SetHeight(PH_DB.BarHeight)
 		end
 		
-		pf:SetWidth(frameW)
+		pf:SetWidth(PH_DB.BarWidth)
 		pf:RegisterForClicks('AnyUp')
 		pf:SetBackdrop( {
 			bgFile = "Interface\\ChatFrame\\ChatFrameBackground";
@@ -460,8 +462,8 @@ function f:CreatePartyFrames()
 		pf.Health:SetPoint('TOPLEFT')
 		pf.Health:SetStatusBarTexture("Interface\\AddOns\\PartyHealer\\textures\\minimalist.tga")
 		pf.Health:SetStatusBarColor(0.25, 0.25, 0.35)
-		pf.Health:SetHeight(frameH)
-		pf.Health:SetWidth(frameW)
+		pf.Health:SetHeight(PH_DB.BarHeight)
+		pf.Health:SetWidth(PH_DB.BarWidth)
 
 		pf.Health.bg = pf.Health:CreateTexture(nil, 'BORDER')
 		pf.Health.bg:SetAllPoints(pf.Health)
@@ -512,8 +514,8 @@ function f:CreatePartyFrames()
 
 		pf.Class = CreateFrame("Frame", nil, pf)
 		pf.Class:SetFrameStrata("MEDIUM")
-		pf.Class:SetWidth(frameH + 4)
-		pf.Class:SetHeight(frameH + 4)
+		pf.Class:SetWidth(PH_DB.BarHeight + 4)
+		pf.Class:SetHeight(PH_DB.BarHeight + 4)
 		pf.Class.icon = pf.Class:CreateTexture(nil, "BACKGROUND")
 		pf.Class.icon:SetTexture("Interface\\AddOns\\PartyHealer\\textures\\Unknown")
 		pf.Class.icon:SetAllPoints(pf.Class)
@@ -521,8 +523,8 @@ function f:CreatePartyFrames()
 		pf.Class:Show()
 		
 		pf.Role = pf.Health:CreateTexture(nil, 'BORDER')
-		pf.Role:SetWidth(frameH + 4)
-		pf.Role:SetHeight(frameH + 4)
+		pf.Role:SetWidth(PH_DB.BarHeight + 4)
+		pf.Role:SetHeight(PH_DB.BarHeight + 4)
 		pf.Role:SetDrawLayer('OVERLAY')
 		pf.Role:SetTexture("Interface\\LFGFrame\\UI-LFG-ICON-PORTRAITROLES")
 		pf.Role:SetPoint("TOPLEFT", pf, "TOPLEFT", -50, 2)
@@ -553,12 +555,12 @@ function f:CreatePartyFrames()
 		end)
 
 		rezbutton:SetPoint("TOPRIGHT",  pf, "TOPRIGHT", 27, 0)
-		rezbutton:SetHeight(frameH + 1)
-		rezbutton:SetWidth(frameH + 1)	
+		rezbutton:SetHeight(PH_DB.BarHeight + 1)
+		rezbutton:SetWidth(PH_DB.BarHeight + 1)	
 		
 		rezbutton.icon = rezbutton:CreateTexture(nil, 'BORDER')
-		rezbutton.icon:SetWidth(frameH + 1)
-		rezbutton.icon:SetHeight(frameH + 1)
+		rezbutton.icon:SetWidth(PH_DB.BarHeight + 1)
+		rezbutton.icon:SetHeight(PH_DB.BarHeight + 1)
 		rezbutton.icon:SetDrawLayer('OVERLAY')
 		rezbutton.icon:SetTexture("Interface\\Icons\\Spell_Holy_Resurrection")
 		rezbutton.icon:SetAllPoints(rezbutton)
@@ -612,6 +614,22 @@ function f:SetButtonAlpha()
 		end
 		button:SetAlpha(PH_DB.Alpha)
 		buttonRez:SetAlpha(PH_DB.Alpha)
+	end
+end
+
+function f:SetBarSize()
+	for i=0,4 do
+		local button
+		local buttonRez
+		if i == 0 then
+			button = PH_PlayerButton
+			buttonRez = PH_PlayerButtonRez
+		else
+			button = getglobal("PH_Party"..i.."Button")
+			buttonRez = getglobal("PH_Party"..i.."ButtonRez")
+		end
+		button:SetWidth(PH_DB.BarWidth)
+		button:SetHeight(PH_DB.BarHeight)
 	end
 end
 

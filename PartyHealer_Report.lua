@@ -180,6 +180,7 @@ function phReport:DoReport()
 	
 	--add headers
 	local lastHeader = 0
+	local lastKey = 0
 	for i=1, #reportTable do
 		if reportTable[i].mouse ~= lastHeader then
 			lastHeader = reportTable[i].mouse

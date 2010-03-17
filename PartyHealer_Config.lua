@@ -14,7 +14,7 @@ local function escapeEditBox(self)
 end
 
 local function saveSettings(self)
-	phConfig:SaveSettings()
+	phConfig:SaveSettings(true)
 	self:ClearFocus()
 end
 
@@ -156,7 +156,7 @@ end)
 	phConfigOpt:SetMovable(true)
 	phConfigOpt:SetClampedToScreen(true)
 	phConfigOpt:SetWidth(250)
-	phConfigOpt:SetHeight(230)
+	phConfigOpt:SetHeight(350)
 
 	phConfigOpt:SetBackdrop({
 			bgFile = "Interface/Tooltips/UI-Tooltip-Background",
@@ -209,18 +209,57 @@ end)
 	phConfigOpt.AlphaSlider:SetPoint('TOP', phConfigOpt, 'TOP', -10, -80)
 	-----------------------------
 
-	local bgChk = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Show in Battleground", "TOP", phConfigOpt, "TOP", -80, -120)
+	--BAR WIDTH
+	-----------------------------
+	phConfigOpt.bWidthSlider = CreateSlider("Unit Bar Width", phConfigOpt, 1, 700, 1)
+	phConfigOpt.bWidthSlider:SetScript('OnShow', function(self)
+		self.onShow = true
+		self:SetValue(PH_DB.BarWidth or 1)
+		self.onShow = nil
+	end)
+	phConfigOpt.bWidthSlider:SetScript('OnValueChanged', function(self, value)
+		--self.valText:SetText(floor(value * 100 + 0.5) .. '%')
+		self.valText:SetText(value)
+		if not self.onShow then
+			if PH_DB then PH_DB.BarWidth = value end
+			if PartyHealer then PartyHealer:SetBarSize() end
+		end
+	end)
+	phConfigOpt.bWidthSlider:SetPoint('TOP', phConfigOpt, 'TOP', -10, -120)
+	-----------------------------
+	
+	--BAR HEIGHT
+	-----------------------------
+	phConfigOpt.bHeightSlider = CreateSlider("Unit Bar Height", phConfigOpt, 1, 700, 1)
+	phConfigOpt.bHeightSlider:SetScript('OnShow', function(self)
+		self.onShow = true
+		self:SetValue(PH_DB.BarHeight or 1)
+		self.onShow = nil
+	end)
+	phConfigOpt.bHeightSlider:SetScript('OnValueChanged', function(self, value)
+		--self.valText:SetText(floor(value * 100 + 0.5) .. '%')
+		self.valText:SetText(value)
+		if not self.onShow then
+			if PH_DB then PH_DB.BarHeight = value end
+			if PartyHealer then PartyHealer:SetBarSize() end
+		end
+	end)
+	phConfigOpt.bHeightSlider:SetPoint('TOP', phConfigOpt, 'TOP', -10, -160)
+	-----------------------------
+	
+	
+	local bgChk = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Show in Battleground", "TOP", phConfigOpt, "TOP", -80, -200)
 	local checksound = bgChk:GetScript("OnClick")
 	bgChk:SetScript("OnClick", function(self) checksound(self); PH_DB.showBG = not PH_DB.showBG end)
 	bgChk:SetScript('OnShow', function(self)
 		self:SetChecked(PH_DB.showBG)
 	end)
-	local arenaChk = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Show in Arena", "TOP", phConfigOpt, "TOP", -80, -150)
+	local arenaChk = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Show in Arena", "TOP", phConfigOpt, "TOP", -80, -230)
 	arenaChk:SetScript("OnClick", function(self) checksound(self); PH_DB.showArena = not PH_DB.showArena end)
 	arenaChk:SetScript('OnShow', function(self)
 		self:SetChecked(PH_DB.showArena)
 	end)
-	local raidChk = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Show in Raid", "TOP", phConfigOpt, "TOP", -80, -180)
+	local raidChk = LibStub("tekKonfig-Checkbox").new(phConfigOpt, nil, "Show in Raid", "TOP", phConfigOpt, "TOP", -80, -260)
 	raidChk:SetScript("OnClick", function(self) checksound(self); PH_DB.showRaid = not PH_DB.showRaid end)
 	raidChk:SetScript('OnShow', function(self)
 		self:SetChecked(PH_DB.showRaid)
@@ -255,7 +294,10 @@ function phConfig:PLAYER_LOGIN()
 	--do the mouse menu
 	for y=1, getn(Mouse_List), 1 do
 		if Mouse_List[y] then
-			menu:AddItem(Mouse_List[y], function() self:switchMouse(y) end)
+			menu:AddItem(Mouse_List[y], function()
+				local mb = y
+				self:switchMouse(mb)
+			end)
 		end
 	end
 	menu:AddItem(' ', function()  end)
@@ -319,7 +361,7 @@ function phConfig:SaveSettings(sSwitch)
 	for y=1, getn(Keys_List), 1 do
 		if getglobal("PartyHealer_ConfigEdit"..y) then
 			local spellName = getglobal("PartyHealer_ConfigEdit"..y):GetText()
-			if strlen(spellName) > 0 then
+			if spellName and strlen(spellName) > 0 then
 				if not PH_DB.spells[mouseButton] then PH_DB.spells[mouseButton] = {} end
 				PH_DB.spells[mouseButton][y] = spellName
 			else
@@ -330,13 +372,13 @@ function phConfig:SaveSettings(sSwitch)
 		end
 	end
 	
-	--delete empty entries
-	for x=1, getn(Mouse_List), 1 do
+	-- delete empty entries
+	-- for x=1, getn(Mouse_List), 1 do
 		--new function "table.maxn" that finds the maximum numeric entry, in case you have a table with holes in it.
-		if PH_DB.spells[x] and table.maxn(PH_DB.spells[x]) <= 0 then
-			PH_DB.spells[x] = nil
-		end
-	end
+		-- if PH_DB.spells[x] and table.maxn(PH_DB.spells[x]) <= 0 then
+			-- PH_DB.spells[x] = nil
+		-- end
+	-- end
 	
 	--reassign the button spells
 	if PartyHealer then
