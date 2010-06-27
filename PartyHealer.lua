@@ -1004,8 +1004,8 @@ function f:SaveLayout(frame)
 		PH_DB[frame] = {
 			["point"] = "CENTER",
 			["relativePoint"] = "CENTER",
-			["xOfs"] = 0,
-			["yOfs"] = 0,
+			["PosX"] = 0,
+			["PosY"] = 0,
 		}
 		opt = PH_DB[frame];
 	end
@@ -1014,8 +1014,6 @@ function f:SaveLayout(frame)
 	local scale = f:GetEffectiveScale();
 	opt.PosX = f:GetLeft() * scale;
 	opt.PosY = f:GetTop() * scale;
-	--opt.Width = f:GetWidth();
-	--opt.Height = f:GetHeight();
 
 end
 
@@ -1030,8 +1028,8 @@ function f:RestoreLayout(frame)
 		PH_DB[frame] = {
 			["point"] = "CENTER",
 			["relativePoint"] = "CENTER",
-			["xOfs"] = 0,
-			["yOfs"] = 0,
+			["PosX"] = 0,
+			["PosY"] = 0,
 		}
 		opt = PH_DB[frame];
 	end
@@ -1040,11 +1038,11 @@ function f:RestoreLayout(frame)
 	local y = opt.PosY;
 	local s = f:GetEffectiveScale();
 
-	    if not x or not y then
+	if (not x or not y) or (x==0 and y==0) then
 		f:ClearAllPoints();
 		f:SetPoint("CENTER", UIParent, "CENTER", 0, 0);
 		return 
-	    end
+	end
 
 	--calculate the scale
 	x,y = x/s,y/s;
